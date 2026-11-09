@@ -104,7 +104,8 @@ void CreateNodes(FILE* file, list_t list, int size) // создаем узлы �
         idx, idx, list.data[idx], list.prev[idx], list.next[idx]);
         if (list.prev[idx] == -1)
         {
-            fprintf(file, "FREE\"];\n");
+            fprintf(file, "FREE\","
+            "color=\"#a1f787\", fillcolor=\"#041a02\", fontcolor=\"#95ff82\"];\n");
         }
         else
         {
