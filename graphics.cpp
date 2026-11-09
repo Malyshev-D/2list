@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct list_t
-{
-    int* data;
-    int* next;
-    int* prev;
-    int capacity;
-};
+#include "struct.h"
 const char graph_code[] = "meow.txt";
 const char graph_img[]  = "meow.png";
 const char html_code[]  = "meow.html";
@@ -50,6 +44,7 @@ void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись
 {
     fprintf(file, "<!DOCTYPE html>\n"
         "<head>\n"
+        "<hr>\n"
         "\t<title>List Dump</title>\n"
         "\t<link rel=\"stylesheet\" href=\"style.css\">\n"
         "</head>\n"
@@ -77,10 +72,13 @@ void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись
     }
     fprintf(file,
     "</div>\n"
-    "\t<h2>Graph visualization</h2>\n"
+    "<h2>Free = %d</h2>\n"
+    "<h2>Last_free = %d</h2>\n"
+    "<h2>Head = %d</h2>\n"
+    "<h2>Tail = %d</h2>\n"
+    "\t<h1>Graph visualization</h1>\n"
     "\t<img src=\"meow%d.png\" alt=\"Graph\">\n"
-    , dump_num);
-
+    , list.free, list.last_free, list.head, list.tail, dump_num);
 }
 
 void CreateGraph(list_t list, int size) // создаем граф
@@ -102,8 +100,16 @@ void CreateNodes(FILE* file, list_t list, int size) // создаем узлы �
 {
     for (int idx = 0; idx <= size; idx++)
     {
-        fprintf(file, "\"%d\"[shape=record, label=\"index = %d | data = %d |{ next = %d | prev = %d }\"];\n",
-        idx, idx, list.data[idx], list.next[idx], list.prev[idx]);
+        fprintf(file, "\"%d\"[shape=record, label=\"index = %d | data = %d |{prev = %d|next = %d}|",
+        idx, idx, list.data[idx], list.prev[idx], list.next[idx]);
+        if (list.prev[idx] == -1)
+        {
+            fprintf(file, "FREE\"];\n");
+        }
+        else
+        {
+            fprintf(file, "RESERVED\"];\n");
+        }
         if (idx > 0)
         {
             fprintf(file, "\"%d\" -> \"%d\";\n", idx - 1, idx);
@@ -116,7 +122,7 @@ void LinkNodes(FILE* file, list_t list, int size) // связываем по nex
     fprintf(file, "edge [style=solid, weight=1, constraint=false, color=\"#24ffed\"];\n");
     for (int idx = 1; idx <= size; idx++)
     {
-        if (list.next[idx] != -1)
+        if (list.prev[idx] != -1)
             fprintf(file, "\"%d\" -> \"%d\";\n", idx, list.next[idx]);
     }
 }
