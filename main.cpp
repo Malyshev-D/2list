@@ -5,10 +5,11 @@
 #include "struct.h"
 #include "graphics.h"
 #include "listop.h"
-// DONE TODO: быстрый алгоритм поиска свободных элементов
-// DONE TODO: верификатор (head + tail, всевозможные проверки)
-// DONE TODO: добавить больше информации на дампе, поменять местами next и prev
-// TODO: закольцевать список??
+// TODO: закольцевать список, чтобы не было условных конструкций при добавлении нового элемента и удаления
+// TODO: Разбить функцию ListAdd на ListInsertBefore и ListInsertAfter для удобства.
+// TODO: Сделать функцию сортировки массива написанную пользователем через твой API.
+// TODO: Условная компиляция дампа
+// TODO: Сортировка
 int main()
 {
     int capacity = 15;
@@ -19,18 +20,21 @@ int main()
     FILE* file = DumpBegin();
 
     ListDump(file, list, capacity, &dump_num);
-    for (int num = 1; num < 8; num++)
+    ListInsertHead(&list, 10, 1);
+    ListDump(file, list, capacity, &dump_num);
+    int value = 0;
+    for (int num = 1; num < 7; num++)
     {
-        ListAdd(&list, num * 10, num - 1);
-        ListDump(file, list, capacity, &dump_num);
+        value = 10 * num;
+        if (num % 2 == 1)
+        {
+            value *= -1;
+        }
+        ListInsertAfter(&list, value, num);
+        // ListDump(file, list, capacity, &dump_num);
     }
-    ListAdd(&list, 35, 3);
     ListDump(file, list, capacity, &dump_num);
-    ListDelete(&list, 4);
-    ListDump(file, list, capacity, &dump_num);
-    ListDelete(&list, 1);
-    ListDump(file, list, capacity, &dump_num);
-    ListDelete(&list, 7);
+    ListDataSort(file, &list, capacity, &dump_num);
     ListDump(file, list, capacity, &dump_num);
     DumpEnd(file);
 

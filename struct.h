@@ -10,8 +10,6 @@ struct list_t
     int  size;
     int  free;
     int  last_free;
-    int  head;
-    int  tail;
 };
 
 #endif

@@ -78,7 +78,7 @@ void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись
     "<h2>Tail = %d</h2>\n"
     "\t<h1>Graph visualization</h1>\n"
     "\t<img src=\"meow%d.png\" alt=\"Graph\">\n"
-    , list.free, list.last_free, list.head, list.tail, dump_num);
+    , list.free, list.last_free, list.next[0], list.prev[0], dump_num);
 }
 
 void CreateGraph(list_t list, int size) // создаем граф
@@ -105,7 +105,7 @@ void CreateNodes(FILE* file, list_t list, int size) // создаем узлы �
         if (list.prev[idx] == -1)
         {
             fprintf(file, "FREE\","
-            "color=\"#a1f787\", fillcolor=\"#041a02\", fontcolor=\"#95ff82\"];\n");
+            "color=\"#a1f787\", fillcolor=\"#020f01a9\", fontcolor=\"#95ff82\"];\n");
         }
         else
         {
