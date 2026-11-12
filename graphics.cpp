@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "struct.h"
 const char graph_code[] = "meow.txt";
-const char graph_img[]  = "meow.png";
 const char html_code[]  = "meow.html";
 
+#include "struct.h"
 #include "graphics.h"
 
-FILE* DumpBegin() // начало дампа = создание файла
+// начало дампа = создание файла
+FILE* DumpBegin()
 {
     FILE* file = fopen(html_code, "w");
     fprintf(file, "<!DOCTYPE html>\n"
@@ -19,8 +19,8 @@ FILE* DumpBegin() // начало дампа = создание файла
     );
     return file;
 }
-
-void DumpEnd(FILE* file) // окончание дампа = вызываем system()
+// окончание дампа = вызываем system()
+void DumpEnd(FILE* file)
 {
     fprintf(file,
     "</body>\n"
@@ -28,23 +28,23 @@ void DumpEnd(FILE* file) // окончание дампа = вызываем sys
     fclose(file);
     system("start meow.html");
 }
-
-void ListDump(FILE* file, list_t list, int size, int* dump_num) // добавление таблиц и графов
+// добавление таблиц и графов
+void ListDump(FILE* file, list_t list, int* dump_num)
 {
-    CreateGraph(list, size);
+    CreateGraph(list);
     // snprintf() - создаем форматированную строку и вставляем в system
     char command[150] = {};
     snprintf(command, sizeof(command), "dot -Tpng meow.txt -o meow%d.png", *dump_num);
     system(command);
-    CreateHtml(file, list, size, *dump_num);
+    CreateHtml(file, list, *dump_num);
     (*dump_num)++;
 }
-
-void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись в html
+// запись в html
+void CreateHtml(FILE* file, list_t list, int dump_num)
 {
     fprintf(file, "<!DOCTYPE html>\n"
         "<head>\n"
-        "<hr>\n"
+
         "\t<title>List Dump</title>\n"
         "\t<link rel=\"stylesheet\" href=\"style.css\">\n"
         "</head>\n"
@@ -59,7 +59,7 @@ void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись
         "\t\t<div class=\"head\">Prev</div>\n"
         "\t</div>\n"
     );
-    for (int idx = 0; idx <= size; idx++)
+    for (int idx = 0; idx <= list.capacity; idx++)
     {
         fprintf(file,
         "\t<div class=\"column\">\n"
@@ -76,12 +76,13 @@ void CreateHtml(FILE* file, list_t list, int size, int dump_num) // запись
     "<h2>Last_free = %d</h2>\n"
     "<h2>Head = %d</h2>\n"
     "<h2>Tail = %d</h2>\n"
+    "<h2>Size = %d</h2>\n"
     "\t<h1>Graph visualization</h1>\n"
     "\t<img src=\"meow%d.png\" alt=\"Graph\">\n"
-    , list.free, list.last_free, list.next[0], list.prev[0], dump_num);
+    , list.free, list.last_free, list.next[0], list.prev[0], list.size, dump_num);
 }
-
-void CreateGraph(list_t list, int size) // создаем граф
+// создаем граф
+void CreateGraph(list_t list)
 {
     FILE* g_file = fopen(graph_code, "w");
     fprintf(g_file, "digraph G {\n");
@@ -90,22 +91,22 @@ void CreateGraph(list_t list, int size) // создаем граф
         "style=\"rounded, filled\", fillcolor=\"#060844\","
         "fontname=\"Arial\", fontcolor=\"#8bf3ff\"];\n"
         "edge [style=invis, weight=100];\n");
-    CreateNodes(g_file, list, size);
-    LinkNodes(g_file, list, size);
+    CreateNodes(g_file, list);
+    LinkNodes(g_file, list);
     fprintf(g_file, "}");
     fclose(g_file);
 }
-
-void CreateNodes(FILE* file, list_t list, int size) // создаем узлы для графа и первично связываем
+// создаем узлы для графа и первично связываем
+void CreateNodes(FILE* file, list_t list)
 {
-    for (int idx = 0; idx <= size; idx++)
+    for (int idx = 0; idx <= list.capacity; idx++)
     {
         fprintf(file, "\"%d\"[shape=record, label=\"index = %d | data = %d |{prev = %d|next = %d}|",
         idx, idx, list.data[idx], list.prev[idx], list.next[idx]);
         if (list.prev[idx] == -1)
         {
             fprintf(file, "FREE\","
-            "color=\"#a1f787\", fillcolor=\"#020f01a9\", fontcolor=\"#95ff82\"];\n");
+            "color=\"#3cff00\", fillcolor=\"#a7aba724\", fontcolor=\"#18ff18\"];\n");
         }
         else
         {
@@ -117,11 +118,11 @@ void CreateNodes(FILE* file, list_t list, int size) // создаем узлы �
         }
     }
 }
-
-void LinkNodes(FILE* file, list_t list, int size) // связываем по next
+// связываем по next
+void LinkNodes(FILE* file, list_t list)
 {
     fprintf(file, "edge [style=solid, weight=1, constraint=false, color=\"#24ffed\"];\n");
-    for (int idx = 1; idx <= size; idx++)
+    for (int idx = 1; idx <= list.capacity; idx++)
     {
         if (list.prev[idx] != -1)
             fprintf(file, "\"%d\" -> \"%d\";\n", idx, list.next[idx]);

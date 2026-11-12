@@ -5,23 +5,20 @@
 #include "struct.h"
 #include "graphics.h"
 #include "listop.h"
-// TODO: закольцевать список, чтобы не было условных конструкций при добавлении нового элемента и удаления
-// TODO: Разбить функцию ListAdd на ListInsertBefore и ListInsertAfter для удобства.
-// TODO: Сделать функцию сортировки массива написанную пользователем через твой API.
-// TODO: Условная компиляция дампа
-// TODO: Сортировка
+// DONE TODO: закольцевать список, чтобы не было условных конструкций при добавлении нового элемента и удаления
+// DONE TODO: Разбить функцию ListAdd на ListInsertBefore и ListInsertAfter для удобства.
+// DONE TODO: Сделать функцию сортировки массива написанную пользователем через API.
+// DONE TODO: Условная компиляция дампа
+// done TODO: Сортировка
 int main()
 {
     int capacity = 15;
     int dump_num = 0;
     list_t list = {};
-    ListInit(&list, capacity);
-
     FILE* file = DumpBegin();
+    ListInit(&list, capacity, file, &dump_num, __LINE__, __FILE__, __FUNCTION__);
+    ListInsertHead(&list, 10, 1, file, &dump_num, __LINE__, __FILE__, __FUNCTION__);
 
-    ListDump(file, list, capacity, &dump_num);
-    ListInsertHead(&list, 10, 1);
-    ListDump(file, list, capacity, &dump_num);
     int value = 0;
     for (int num = 1; num < 7; num++)
     {
@@ -30,12 +27,10 @@ int main()
         {
             value *= -1;
         }
-        ListInsertAfter(&list, value, num);
-        // ListDump(file, list, capacity, &dump_num);
+        ListInsertAfter(&list, value, num, file, &dump_num, __LINE__, __FILE__, __FUNCTION__);
     }
-    ListDump(file, list, capacity, &dump_num);
-    ListDataSort(file, &list, capacity, &dump_num);
-    ListDump(file, list, capacity, &dump_num);
+
+    ListDataSort(&list, CompareDown, file, &dump_num, __LINE__, __FILE__, __FUNCTION__);
     DumpEnd(file);
 
     free(list.data);
